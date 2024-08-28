@@ -1,3 +1,4 @@
+import { useKeyboardContext } from "@/context/KeyboardContext";
 import LottieView from "lottie-react-native";
 import React, { useEffect, useState } from "react";
 import {
@@ -12,24 +13,8 @@ import {
 
 export default function LoginScreen() {
 
-  const [isKeyboardVisible, setKeyboardVisible] = useState<boolean>(false);
+  const { isKeyboardVisible } = useKeyboardContext();
 
-  useEffect(() => {
-    const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () =>
-      setKeyboardVisible(true)
-    );
-    const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () =>
-      setKeyboardVisible(false)
-    );
-
-    // Cleanup listeners on component unmount
-    return () => {
-      keyboardDidHideListener.remove();
-      keyboardDidShowListener.remove();
-    };
-  }, []);
-
-  
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.containerLogoTitle}>
