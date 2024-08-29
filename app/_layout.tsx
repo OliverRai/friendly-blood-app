@@ -30,11 +30,6 @@ export default function RootLayout() {
     }
   }, [loaded]);
 
-  if (!loaded) {
-    return null;
-  }
-
-
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () =>
       setKeyboardVisible(true)
@@ -50,12 +45,17 @@ export default function RootLayout() {
     };
   }, []);
 
+  if (!loaded) {
+    return null;
+  }
+
   return (
     <GestureHandlerRootView style={{ flex: 1}}>
       <KeyboardContext.Provider value={{ isKeyboardVisible}}>
         <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
           <Stack>
             <Stack.Screen name="login" options={{ headerShown: false}}/>
+            <Stack.Screen name="register" options={{ headerShown: false}}/>
             <Stack.Screen name="(auth)" />
             <Stack.Screen name="+not-found" />
           </Stack>

@@ -1,67 +1,75 @@
 import { useKeyboardContext } from "@/context/KeyboardContext";
-import LottieView from "lottie-react-native";
-import React, { useEffect, useState } from "react";
-import {
-  Keyboard,
-  SafeAreaView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import React, { useEffect } from "react";
+import { Pressable, StyleSheet, Text, View } from "react-native";
+
+import Input from "@/components/atom/input";
+import LottieBlood from "@/components/atom/lottieBlood";
+import LoginTemplate from "@/components/templates/loginTemplate";
+import { useAuthStore } from "@/store/auth";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Link } from "expo-router";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 
 export default function LoginScreen() {
+  const userLoginSchema = z.object({
+    email: z.string().email("Email inválido"),
+    password: z.string().min(6, "Senha deve ter no mínimo 6 caracteres"),
+  });
+  type userLogin = z.infer<typeof userLoginSchema>;
+
+  const {
+    register,
+    setValue,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<userLogin>({
+    resolver: zodResolver(userLoginSchema),
+  });
+
+  const { login } = useAuthStore();
 
   const { isKeyboardVisible } = useKeyboardContext();
 
+  const loginSubmit = (data: userLogin) => {};
+
+  useEffect(() => {
+    register("email");
+    register("password");
+  }, [register]);
+
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.containerLogoTitle}>
-        <Text style={styles.logoTitle}>Doe sangue.</Text>
-        <Text style={styles.logoTitle}>Salve vidas.</Text>
-      </View>
-      <View style={[styles.containerForm, isKeyboardVisible ? { height: 380} : {}]}>
-        <LottieView
-          source={require("../assets/animation/blood-animation.json")}
-          loop
-          autoPlay
-          style={[styles.animation , isKeyboardVisible ? { marginBottom: 10} : {}]}
+    <LoginTemplate>
+      <View
+        style={[styles.containerForm, isKeyboardVisible ? { height: 380 } : {}]}
+      >
+        <LottieBlood />
+        <Input
+          placeholder="e-mail"
+          onChangeText={(text) => setValue("email", text)}
+          error={errors?.email?.message}
         />
-        <TextInput style={styles.input} placeholder="Username" />
-        <TextInput
-          style={styles.input}
+        <Input
           placeholder="Password"
           secureTextEntry
+          onChangeText={(text) => setValue("password", text)}
+          error={errors?.password?.message}
         />
-        <TouchableOpacity
+        <Pressable
           style={styles.loginButton}
-          activeOpacity={0.7}
-          onPress={() => {
-            /* Handle login logic */
-          }}
+          onPress={handleSubmit(loginSubmit)}
         >
           <Text style={styles.loginButtonText}>Login</Text>
-        </TouchableOpacity>
-        <Text style={styles.signUp}>Sign Up</Text>
+        </Pressable>
+        <Link href="/register" style={styles.signUp}>
+          Sign Up
+        </Link>
       </View>
-    </SafeAreaView>
+    </LoginTemplate>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "red",
-  },
-  containerLogoTitle: {
-    width: "100%",
-    paddingRight: 30,
-    alignItems: "flex-end",
-    marginBottom: 16,
-  },
   animation: {
     width: 200,
     height: 150,
@@ -75,21 +83,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     width: "90%",
     height: 400,
-    gap: 10,
-  },
-  logoTitle: {
-    fontWeight: "bold",
-    color: "#FFF",
-    fontSize: 30,
-    textAlign: "justify",
-  },
-  input: {
-    height: 35,
-    width: "90%",
-    borderColor: "gray",
-    borderRadius: 7,
-    borderWidth: 1,
-    paddingHorizontal: 8,
+    gap: 20,
   },
   loginButton: {
     backgroundColor: "#8B0000",
